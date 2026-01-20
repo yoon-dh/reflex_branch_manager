@@ -1,6 +1,7 @@
 import reflex as rx
 from reflex_test.layout import layout
 from reflex_test.state import UserState
+from reflex_test.components.data_table import data_table
 
 def user_page():
     return layout(
@@ -37,15 +38,15 @@ def user_page():
 
             rx.divider(),
 
-            rx.foreach(
+            data_table(
                 UserState.users,
-                lambda u: rx.hstack(
-                    rx.text(u["id"]),
-                    rx.text(u["name"]),
-                    rx.text(u["email"]),
-                    spacing="4",
-                    key=u["id"],
-                ),
+                columns=[
+                    ("ID", "id", "80px"),
+                    ("이름", "name", "1fr"),
+                    ("이메일", "email", "2fr"),
+                ],
+                row_key="id",
+                empty_text="회원 데이터가 없습니다.",
             ),
 
             on_mount=UserState.load,
