@@ -1,6 +1,6 @@
 import duckdb
 import os
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 # MotherDuck 설정
 # 보안을 위해 실제 서비스 시에는 .env 파일에 저장하고 os.getenv("MOTHERDUCK_TOKEN")으로 읽으세요.
@@ -58,6 +58,24 @@ def get_users() -> List[Dict]:
         {"id": r[0], "name": r[1], "email": r[2]}
         for r in rows
     ]
+
+def get_users(name: Optional[str] = None) -> List[Dict]:
+    with get_conn() as conn:
+        if name and name.strip():
+            rows = conn.execute(
+                """ 
+                SELECT id, name, email 
+                FROM users 
+                WHERE name ILIKE ? 
+                ORDER BY id 
+                """,
+                (f"%{name.strip()}%",),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT id, name, email FROM users ORDER BY id"
+            ).fetchall()
+        return [{"id": r[0], "name": r[1], "email": r[2]} for r in rows]
 
 
 if __name__ == "__main__":
